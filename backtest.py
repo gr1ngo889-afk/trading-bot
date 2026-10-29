@@ -19,11 +19,11 @@ from strategy import UNIVERSE, decide
 
 HL_API = "https://api.hyperliquid.xyz/info"
 YAHOO = "https://query1.finance.yahoo.com/v8/finance/chart/{}?period1=946684800&period2={}&interval=1d"
-TICKER = {"mkts:US500": "SPY", "xyz:SMH": "SMH", "xyz:XLE": "XLE", "xyz:TLT": "TLT", "xyz:MSFT": "MSFT",
+TICKER = {"xyz:SP500": "SPY", "xyz:SMH": "SMH", "xyz:XLE": "XLE", "xyz:TLT": "TLT", "xyz:MSFT": "MSFT",
           "xyz:GOOGL": "GOOGL", "xyz:LLY": "LLY", "xyz:COST": "COST", "xyz:AAPL": "AAPL", "xyz:AMZN": "AMZN",
           "xyz:NVDA": "NVDA", "xyz:META": "META"}
 # shortcut: last year's average Liquid funding (APR, longs pay) applied to all 26 years; real funding moves with demand
-FUNDING_APR = {"mkts:US500": 0.025, "xyz:SMH": 0.148, "xyz:XLE": 0.161, "xyz:TLT": 0.211, "xyz:MSFT": 0.073,
+FUNDING_APR = {"xyz:SP500": 0.022, "xyz:SMH": 0.148, "xyz:XLE": 0.161, "xyz:TLT": 0.211, "xyz:MSFT": 0.073,
                "xyz:GOOGL": 0.106, "xyz:LLY": 0.165, "xyz:COST": 0.081, "xyz:AAPL": 0.022, "xyz:AMZN": 0.087,
                "xyz:NVDA": 0.104, "xyz:META": 0.073}
 FEE = 0.0005  # per side; shortcut: flat taker fee, check HIP-3 fee schedule before going live
@@ -201,10 +201,10 @@ def report(label, bars, fund, start, end, exit_rule):
 
 def benchmarks(bars, fund, start, end):
     years = (end - start) / DAY / 365.25
-    spy = buy_and_hold(bars, fund, ["mkts:US500"], start, end)
+    spy = buy_and_hold(bars, fund, ["xyz:SP500"], start, end)
     held = [s for s in UNIVERSE if min(bars[s]) <= start + 10 * DAY]
     ew = buy_and_hold(bars, fund, held, start, end)
-    print(f"  {'Hold US500':26} total {spy:+8.1%}  per year {(1 + spy) ** (1 / years) - 1:+6.1%}")
+    print(f"  {'Hold SP500':26} total {spy:+8.1%}  per year {(1 + spy) ** (1 / years) - 1:+6.1%}")
     print(f"  {f'Hold all {len(held)} equally':26} total {ew:+8.1%}  per year {(1 + ew) ** (1 / years) - 1:+6.1%}")
 
 
@@ -214,8 +214,8 @@ if __name__ == "__main__":
     m = indicators(up, [x + 1 for x in up], [x - 1 for x in up])
     assert m["rsi14"] == 100 and abs(m["atr14"] - 2) < 1e-9 and m["sma50"] is None
     # self-check: buy-and-hold of a flat market with no funding loses exactly the two fees
-    flat = {"mkts:US500": {t * DAY: (10, 10, 10, 10) for t in range(5)}}
-    assert abs(buy_and_hold(flat, {"mkts:US500": {}}, ["mkts:US500"], 0, 4 * DAY) - (-2 * FEE + FEE ** 2)) < 1e-12
+    flat = {"xyz:SP500": {t * DAY: (10, 10, 10, 10) for t in range(5)}}
+    assert abs(buy_and_hold(flat, {"xyz:SP500": {}}, ["xyz:SP500"], 0, 4 * DAY) - (-2 * FEE + FEE ** 2)) < 1e-12
 
     if sys.argv[1:] == ["hl"]:
         bars, fund = load_hl()
@@ -226,7 +226,7 @@ if __name__ == "__main__":
         sys.exit()
 
     bars, fund = load_yahoo()
-    end = max(bars["mkts:US500"])
+    end = max(bars["xyz:SP500"])
     if sys.argv[1:2] == ["test"]:
         print("Test on 2016-today")
         a, rules = ms("2016-01-01"), sys.argv[2:]

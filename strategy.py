@@ -5,7 +5,7 @@ Rules
 - Exit when price closes below SMA200 (picked on 2000-2015; the SMA50 exit whipsawed). A stop at entry - 3*ATR14 sits on the exchange as a backstop.
 - Size so hitting the stop loses 1% of equity, capped at 20% of equity per position.
 - 1x leverage only; total exposure never exceeds equity.
-Benchmark: buy-and-hold mkts:US500 from the same start date.
+Benchmark: buy-and-hold xyz:SP500 from the same start date.
 
 Usage: python3 strategy.py < snapshot.json
 snapshot = {"equity": float, "held": [symbol, ...],
@@ -14,7 +14,7 @@ snapshot = {"equity": float, "held": [symbol, ...],
 import json
 import sys
 
-UNIVERSE = ["mkts:US500", "xyz:SMH", "xyz:XLE", "xyz:TLT", "xyz:MSFT", "xyz:GOOGL", "xyz:LLY", "xyz:COST",
+UNIVERSE = ["xyz:SP500", "xyz:SMH", "xyz:XLE", "xyz:TLT", "xyz:MSFT", "xyz:GOOGL", "xyz:LLY", "xyz:COST",
             "xyz:AAPL", "xyz:AMZN", "xyz:NVDA", "xyz:META"]
 RISK_PER_TRADE = 0.01
 STOP_ATR = 3
@@ -52,19 +52,19 @@ def decide(equity, held, markets, exposure=0.0, exit_rule="sma200"):
 def _selftest():
     up = {"price": 100, "sma50": 95, "sma200": 90, "rsi14": 55, "atr14": 2}
     # risk $100 over a $6 stop distance on a $100 stock -> ~$1666 notional
-    a = decide(10_000, [], {"mkts:US500": up})
+    a = decide(10_000, [], {"xyz:SP500": up})
     assert a[0]["action"] == "buy" and a[0]["notional"] == 1666.67 and a[0]["stop"] == 94
-    assert decide(10_000, [], {"mkts:US500": {**up, "rsi14": 75}}) == []          # overextended
-    assert decide(10_000, [], {"mkts:US500": {**up, "sma50": 85}}) == []          # not in uptrend
-    assert decide(10_000, ["mkts:US500"], {"mkts:US500": up}) == []               # already held, keep
-    assert decide(10_000, ["mkts:US500"], {"mkts:US500": {**up, "price": 89}})[0]["action"] == "close"
-    assert decide(10_000, [], {"mkts:US500": {**up, "atr14": 0.1}})[0]["notional"] == 2000  # 20% cap
-    assert decide(10_000, [], {"mkts:US500": up}, exposure=9_995) == []           # no leverage
-    assert decide(10_000, [], {"mkts:US500": {**up, "sma200": None}}) == []       # short history
+    assert decide(10_000, [], {"xyz:SP500": {**up, "rsi14": 75}}) == []          # overextended
+    assert decide(10_000, [], {"xyz:SP500": {**up, "sma50": 85}}) == []          # not in uptrend
+    assert decide(10_000, ["xyz:SP500"], {"xyz:SP500": up}) == []               # already held, keep
+    assert decide(10_000, ["xyz:SP500"], {"xyz:SP500": {**up, "price": 89}})[0]["action"] == "close"
+    assert decide(10_000, [], {"xyz:SP500": {**up, "atr14": 0.1}})[0]["notional"] == 2000  # 20% cap
+    assert decide(10_000, [], {"xyz:SP500": up}, exposure=9_995) == []           # no leverage
+    assert decide(10_000, [], {"xyz:SP500": {**up, "sma200": None}}) == []       # short history
     dip = {**up, "price": 92}                                                     # below SMA50, above SMA200
-    assert decide(10_000, ["mkts:US500"], {"mkts:US500": dip}, exit_rule="sma200") == []
-    assert decide(10_000, ["mkts:US500"], {"mkts:US500": dip}, exit_rule="cross") == []
-    assert decide(10_000, ["mkts:US500"], {"mkts:US500": {**dip, "sma50": 89}}, exit_rule="cross")[0]["action"] == "close"
+    assert decide(10_000, ["xyz:SP500"], {"xyz:SP500": dip}, exit_rule="sma200") == []
+    assert decide(10_000, ["xyz:SP500"], {"xyz:SP500": dip}, exit_rule="cross") == []
+    assert decide(10_000, ["xyz:SP500"], {"xyz:SP500": {**dip, "sma50": 89}}, exit_rule="cross")[0]["action"] == "close"
 
 
 if __name__ == "__main__":
