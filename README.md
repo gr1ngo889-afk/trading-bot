@@ -27,5 +27,9 @@ Long-only trend-following bot for Liquid's stock perps (`xyz:` markets on Hyperl
 5. Add a row to `JOURNAL.md` (equity, SP500 price, bot vs SP500 return since 2026-10-25 21:32 UTC: start equity $10,000, SP500 7642). Commit and push.
 6. For each action, preview it (`suggest_trade`, or `close_position` for sells) and show the user the exact terms.
    **Execute only after the user explicitly approves those exact terms in chat.** Log fills in `JOURNAL.md`, commit, push.
+7. **How to reach the user:** whenever a decision is needed (trades to approve, a delisted market, anything blocking),
+   first send a push notification (one line, under 200 characters, saying what needs deciding), then ask with a
+   pop-up question (AskUserQuestion) rather than plain text. For trades: one question with the exact terms and
+   options like "Approve all", "Approve some", "Skip today". Every other question also goes in a pop-up.
 
 See `JOURNAL.md` for positions and performance.
