@@ -24,6 +24,8 @@ Liquid delisted mkts:US500 and lists the S&P 500 as xyz:SP500 (about 10x the pri
 | 2026-11-04 | $10,167.05 | 7701.40 (SP500) | +1.67% vs +0.78% |
 | 2026-11-09 | $10,121.46 | 7550.70 (SP500) | +1.21% vs -1.19% |
 | 2026-11-10 | $10,108.05 | 7534.10 (SP500) | +1.08% vs -1.41% |
+| 2026-11-11 | $10,063.33 | 7619.30 (SP500) | +0.63% vs -0.30% |
 
 Nov 3-6: daily runs were cut off by session restarts. Nov 3/4 rows are from data read during those runs;
 Nov 4's buy signals (SP500, AAPL) were never shown for approval. Nov 5-6 have no data.
+Nov 10: COST and AAPL buys were approved in a pop-up but the request was interrupted before execution; nothing was placed.
