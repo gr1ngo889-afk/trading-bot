@@ -10,6 +10,7 @@ Liquid delisted mkts:US500 and lists the S&P 500 as xyz:SP500 (about 10x the pri
 | 2026-10-25 | buy | xyz:LLY | $1,397.85 | 1274.00 | 1182.86 (exchange: 1182.9) | 144080 |
 | 2026-10-25 | buy | xyz:AAPL | $2,000.00 | 346.92 | 330.54 | 144082 |
 | 2026-11-02 | stop hit | xyz:AAPL | -$97.64 (+$3.71 fees) | 329.98 | | 144083 |
+| 2026-11-11 | buy | xyz:AAPL | $1,484.82 | 355.01 | 330.94 | 182990 |
 
 | Date | Equity | US500 / SP500 | Bot vs hold |
 |---|---|---|---|
