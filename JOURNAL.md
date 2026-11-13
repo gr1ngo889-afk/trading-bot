@@ -11,6 +11,7 @@ Liquid delisted mkts:US500 and lists the S&P 500 as xyz:SP500 (about 10x the pri
 | 2026-10-25 | buy | xyz:AAPL | $2,000.00 | 346.92 | 330.54 | 144082 |
 | 2026-11-02 | stop hit | xyz:AAPL | -$97.64 (+$3.71 fees) | 329.98 | | 144083 |
 | 2026-11-11 | buy | xyz:AAPL | $1,484.82 | 355.01 | 330.94 | 182990 |
+| 2026-11-13 | buy | xyz:AMZN | $924.00 | 265.20 | 236.33 | 187382 |
 
 | Date | Equity | US500 / SP500 | Bot vs hold |
 |---|---|---|---|
@@ -31,3 +32,8 @@ Liquid delisted mkts:US500 and lists the S&P 500 as xyz:SP500 (about 10x the pri
 Nov 3-6: daily runs were cut off by session restarts. Nov 3/4 rows are from data read during those runs;
 Nov 4's buy signals (SP500, AAPL) were never shown for approval. Nov 5-6 have no data.
 Nov 10: COST and AAPL buys were approved in a pop-up but the request was interrupted before execution; nothing was placed.
+
+Nov 13: intraday run (10:40am NY). Liquid indicators gave no signals. AMZN passed the rule on exchange (trading-day)
+data from Shibui (267.44 > SMA50 254.66 > SMA200 244.47, RSI 58) but not on Liquid's candles (SMA50 253.81 < SMA200 255.19).
+Liquid's daily perp candles include weekends, so its SMA200 covers ~200 calendar days (~140 trading days), unlike the backtest.
+User approved the AMZN buy on that basis (risk 1% of equity, stop 3x ATR14 from Liquid).
