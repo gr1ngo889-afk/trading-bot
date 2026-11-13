@@ -1,6 +1,6 @@
 # Trend bot (Liquid paper trading)
 
-Long-only trend-following bot for Liquid's stock perps (`xyz:` markets on Hyperliquid). **Paper trading only.**
+Long-only trend-following bot (plus an optional pullback sleeve) for Liquid's stock perps (`xyz:` markets on Hyperliquid). **Paper trading only.**
 
 ## Rules (`strategy.py`)
 - Buy when price > SMA50 > SMA200 and RSI14 < 70 (daily candles).
@@ -8,6 +8,15 @@ Long-only trend-following bot for Liquid's stock perps (`xyz:` markets on Hyperl
 - Size so the stop loses 1% of equity, max 20% of equity per position, 1x leverage, never more than equity in total.
 - Markets with fewer than 200 days of history are skipped until they have it.
 - `python3 strategy.py < snapshot.json` prints the actions; it self-tests on every run.
+
+## Pullback sleeve (`pullback.py`, on since 2026-11-13: `PULLBACK_ENABLED = True`)
+- Buy when close > SMA200 and the close fell at least 2x ATR14 over the last 5 trading days (a sharp dip in an uptrend).
+- Exit when close > SMA5, or 5 trading days after the last signal, or close below signal close - 3x ATR14.
+- 33% of equity per lot, max 3 lots, only with cash the trend sleeve leaves (never more than 1x in total).
+  Deepest dips first. If the trend sleeve holds the symbol, the lot is added to that position and later reduced by the same units.
+- Lots are tracked in `pullback_state.json` (units, stop, trading days since signal).
+- 1990-2026 at ~0.10% fees: trend alone 5.7%/yr (worst drop -27%), trend + pullback 8.4%/yr (worst drop -26%).
+  Details, out-of-sample and walk-forward tests in `research/RESULTS.md`.
 
 ## Backtest findings (`backtest.py`)
 - Rule picked on 2000-2015 only (SMA200 exit beat SMA50 exit and the 50/200 cross), then run once on 2016-today.
@@ -23,7 +32,11 @@ Long-only trend-following bot for Liquid's stock perps (`xyz:` markets on Hyperl
 1. Confirm Liquid `paper_trading_status` is ENABLED; if not, stop and tell the user. Never trade live.
 2. `get_portfolio` (skipCache): equity, positions, stop coverage. A missing position means its stop probably triggered; check position history.
 3. `get_technical_indicators` (1d; sma, rsi, atr) for every symbol in `UNIVERSE`, plus `xyz:SP500` for the benchmark.
-4. Build the snapshot (`equity`, `held`, `exposure` = margin used, `markets`) and run `strategy.py`.
+   Liquid's daily candles include weekends, so cross-check signals against Shibui Finance trading-day data and flag
+   disagreements. The pullback sleeve uses Shibui trading-day values only (`sma200`, `atr14`, `sma5`, `close_5d_ago`).
+4. Build the snapshot (`equity`, `held`, `exposure` = margin used, `markets`, `pullback` = contents of
+   `pullback_state.json`) and run `strategy.py` .
+   After fills, write the returned `pullback_lots` to `pullback_state.json`.
 5. Add a row to `JOURNAL.md` (equity, SP500 price, bot vs SP500 return since 2026-10-25 21:32 UTC: start equity $10,000, SP500 7642). Commit and push.
 6. For each action, preview it (`suggest_trade`, or `close_position` for sells) and show the user the exact terms.
    **Execute only after the user explicitly approves those exact terms in chat.** Log fills in `JOURNAL.md`, commit, push.
