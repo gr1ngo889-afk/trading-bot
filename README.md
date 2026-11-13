@@ -32,4 +32,8 @@ Long-only trend-following bot for Liquid's stock perps (`xyz:` markets on Hyperl
    pop-up question (AskUserQuestion) rather than plain text. For trades: one question with the exact terms and
    options like "Approve all", "Approve some", "Skip today". Every other question also goes in a pop-up.
 
+**Positions the bot does not manage:** `xyz:AMZN` (opened 2026-11-13 outside the daily run) belongs to the user.
+Count it in equity and exposure and in `held` (so the bot never buys more), but ignore any action the strategy outputs
+for it and never close or modify it.
+
 See `JOURNAL.md` for positions and performance.
