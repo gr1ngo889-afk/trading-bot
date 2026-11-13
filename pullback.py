@@ -18,7 +18,7 @@ snapshot["pullback"] = {"lots": {symbol: {"units", "stop", "days_since_signal"}}
 snapshot["markets"][symbol] also needs "sma5" and "close_5d_ago" (trading days).
 """
 
-PULLBACK_ENABLED = False  # flip to True only after the user approves adopting the sleeve
+PULLBACK_ENABLED = True  # adopted by the user 2026-11-13 (trend + pullback)
 DROP_ATR = 2.0
 HOLD_DAYS = 5
 STOP_ATR = 3
