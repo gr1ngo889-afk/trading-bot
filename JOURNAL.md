@@ -27,7 +27,9 @@ Liquid delisted mkts:US500 and lists the S&P 500 as xyz:SP500 (about 10x the pri
 | 2026-11-10 | $10,108.05 | 7534.10 (SP500) | +1.08% vs -1.41% |
 | 2026-11-11 | $10,063.33 | 7619.30 (SP500) | +0.63% vs -0.30% |
 | 2026-11-12 | $10,060.47 | 7598.30 (SP500) | +0.60% vs -0.57% |
+| 2026-11-13 | $10,071.48 | 7519.90 (SP500) | +0.71% vs -1.60% |
 
 Nov 3-6: daily runs were cut off by session restarts. Nov 3/4 rows are from data read during those runs;
 Nov 4's buy signals (SP500, AAPL) were never shown for approval. Nov 5-6 have no data.
 Nov 10: COST and AAPL buys were approved in a pop-up but the request was interrupted before execution; nothing was placed.
+Nov 13: an AMZN long (3.484 @ 265.20, stop 236.33, order 187382, 15:45 UTC) appeared in the shared paper account; not placed by the bot's daily run. Equity rows from Nov 13 include it.
