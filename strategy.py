@@ -65,11 +65,35 @@ def _selftest():
     assert decide(10_000, ["xyz:SP500"], {"xyz:SP500": dip}, exit_rule="sma200") == []
     assert decide(10_000, ["xyz:SP500"], {"xyz:SP500": dip}, exit_rule="cross") == []
     assert decide(10_000, ["xyz:SP500"], {"xyz:SP500": {**dip, "sma50": 89}}, exit_rule="cross")[0]["action"] == "close"
+    # plan(): sleeve stays off unless enabled; when on, it only uses cash left after the trend buys
+    snap = {"equity": 10_000, "held": [], "exposure": 0,
+            "markets": {"xyz:SP500": {**up, "sma200": 90, "sma5": 99, "close_5d_ago": 105}}}  # -2.5 ATR dip
+    assert [a["sleeve"] for a in plan(snap, False)["actions"]] == ["trend"]
+    p = plan(snap, True)["actions"]
+    assert [(a["sleeve"], a["action"]) for a in p] == [("trend", "buy"), ("pullback", "add")]
+    assert p[1]["notional"] == 3300 and p[1]["stop"] is None
+
+
+def plan(s, pullback_on=None):
+    """Trend actions, then (when enabled) pullback-sleeve actions using only the cash the trend sleeve leaves.
+    Returns {"actions": [...], "pullback_lots": {...}}; save pullback_lots to pullback_state.json after fills."""
+    import pullback
+    exposure = s.get("exposure", 0.0)
+    actions = [dict(a, sleeve="trend") for a in decide(s["equity"], s["held"], s["markets"], exposure)]
+    lots = s.get("pullback", {}).get("lots", {})
+    if pullback.PULLBACK_ENABLED if pullback_on is None else pullback_on:
+        used = exposure + sum(a["notional"] for a in actions if a["action"] == "buy")  # closes not netted: conservative
+        closing = [a["symbol"] for a in actions if a["action"] == "close"]
+        buying = [a["symbol"] for a in actions if a["action"] == "buy"]
+        trend_held = [h for h in s["held"] if h not in closing] + buying
+        pb, lots = pullback.decide_pullback(s["equity"], used, lots, s["markets"], trend_held, closing)
+        actions += pb
+    return {"actions": actions, "pullback_lots": lots}
 
 
 if __name__ == "__main__":
     _selftest()
     raw = sys.stdin.read()
     if raw.strip():
-        s = json.loads(raw)
-        print(json.dumps(decide(s["equity"], s["held"], s["markets"], s.get("exposure", 0.0)), indent=2))
+        # --pullback previews the sleeve even while PULLBACK_ENABLED is False (nothing is traded from a preview)
+        print(json.dumps(plan(json.loads(raw), True if "--pullback" in sys.argv else None), indent=2))
